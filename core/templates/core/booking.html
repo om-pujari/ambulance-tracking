@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Ambulance</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="page-shell booking-shell">
+    <div class="booking-background"></div>
+    <main class="booking-stage" id="booking-stage">
+        <div class="booking-intro">
+            <div class="eyebrow">Smart dispatch</div>
+            <h1>Request an ambulance in four quick steps.</h1>
+            <p>Verify the rider, choose the vehicle, and let the dispatch engine do the rest.</p>
+            <a class="secondary-link" href="{% url 'landing' %}">Back to home</a>
+        </div>
+
+        <div class="modal-stack">
+            <section class="flow-modal is-active" data-step="1">
+                <span class="step-chip">Step 1</span>
+                <h2>Enter phone number</h2>
+                <p>We will send an OTP to verify the booking request.</p>
+                <form id="phone-form">
+                    {% csrf_token %}
+                    <label for="booking-phone">Phone number</label>
+                    <input id="booking-phone" name="phone" type="tel" placeholder="+91 9876543210" required>
+                    <button type="submit" class="solid-button">Send OTP</button>
+                </form>
+            </section>
+
+            <section class="flow-modal" data-step="2">
+                <span class="step-chip">Step 2</span>
+                <h2>Verify OTP</h2>
+                <p>Enter the code sent to the rider phone number.</p>
+                <form id="otp-form">
+                    <label for="otp-code">OTP code</label>
+                    <input id="otp-code" name="code" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit code" required>
+                    <button type="submit" class="solid-button">Verify OTP</button>
+                </form>
+            </section>
+
+            <section class="flow-modal" data-step="3">
+                <span class="step-chip">Step 3</span>
+                <h2>Select ambulance type</h2>
+                <p>Choose the vehicle category required for this emergency.</p>
+                <div class="selection-grid" id="ambulance-options">
+                    <button type="button" class="selection-card" data-ambulance="ICU">ICU</button>
+                    <button type="button" class="selection-card" data-ambulance="ALS">ALS</button>
+                    <button type="button" class="selection-card" data-ambulance="BLS">BLS</button>
+                </div>
+            </section>
+
+            <section class="flow-modal" data-step="4">
+                <span class="step-chip">Step 4</span>
+                <h2>Hospital preference</h2>
+                <p>We will also capture your live location for dispatch routing.</p>
+                <div class="selection-grid" id="hospital-options">
+                    <button type="button" class="selection-card" data-hospital="Gov">Government</button>
+                    <button type="button" class="selection-card" data-hospital="Pri">Private</button>
+                    <button type="button" class="selection-card" data-hospital="near">Nearest</button>
+                </div>
+            </section>
+
+            <section class="flow-modal success-modal" data-step="5">
+                <span class="step-chip">Complete</span>
+                <h2>Booking created</h2>
+                <p id="booking-result-text">Your request has been sent to dispatch.</p>
+                <a class="solid-button" id="tracking-link" href="{% url 'landing' %}">Track Ambulance</a>
+            </section>
+        </div>
+
+        <div class="form-message" id="booking-message"></div>
+    </main>
+
+    <script>
+        /* Frontend configuration injected from Django. */
+        window.bookingConfig = {
+            csrfToken: "{{ csrf_token }}",
+            urls: {
+                sendOtp: "{% url 'send_otp' %}",
+                verifyOtp: "{% url 'verify_otp' %}",
+                saveAmbulance: "{% url 'hospital_pref' %}",
+                createBooking: "{% url 'create_booking' %}"
+            }
+        };
+    </script>
+    <script src="{% static 'js/booking.js' %}"></script>
+</body>
+</html>
+

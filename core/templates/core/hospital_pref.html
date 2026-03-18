@@ -1,0 +1,25 @@
+<html><body>
+    
+<h2>Hospital Preference</h2>
+
+<form method="POST" action="/create-booking/">
+    {% csrf_token %}
+
+    <select name="hospital_pref">
+        <option value="Gov">Government</option>
+        <option value="Pri">Private</option>
+        <option value="near">Nearest</option>
+    </select>
+
+    <button type="submit">Book Ambulance</button>
+    <input type="hidden" name="lat" id="lat">
+    <input type="hidden" name="lon" id="lon">
+</form>
+</body>
+<script>
+navigator.geolocation.getCurrentPosition(function(pos){
+    document.getElementById("lat").value = pos.coords.latitude;
+    document.getElementById("lon").value = pos.coords.longitude;
+});
+</script>
+</html>

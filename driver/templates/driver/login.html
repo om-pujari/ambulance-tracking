@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Login</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="page-shell auth-shell">
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <main class="auth-card">
+        <div class="eyebrow">Driver access</div>
+        <h1>Sign in to your dispatch console</h1>
+        <p>Use your existing driver credentials to continue.</p>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            <label for="username">Username</label>
+            <input id="username" type="text" name="username" placeholder="Enter username" required>
+
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" placeholder="Enter password" required>
+
+            {% if error %}
+            <div class="form-message error">{{ error }}</div>
+            {% endif %}
+
+            <button type="submit" class="solid-button">Login</button>
+        </form>
+    </main>
+</body>
+</html>

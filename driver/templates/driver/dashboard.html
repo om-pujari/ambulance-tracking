@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+</head>
+<body class="dashboard-shell">
+    <main class="driver-layout">
+        <aside class="driver-sidebar">
+            <section class="profile-card">
+                <div class="profile-topline">
+                    <div>
+                        <div class="eyebrow">Driver profile</div>
+                        <h1>{{ driver_data.name }}</h1>
+                    </div>
+                    <a class="ghost-link" href="{% url 'driver_logout' %}">Logout</a>
+                </div>
+
+                <div class="profile-grid">
+                    <div class="profile-item">
+                        <span>Name</span>
+                        <strong>{{ driver_data.name }}</strong>
+                    </div>
+                    <div class="profile-item">
+                        <span>Age</span>
+                        <strong>{{ driver_data.age|default:"Not set" }}</strong>
+                    </div>
+                    <div class="profile-item">
+                        <span>License</span>
+                        <strong>{{ driver_data.license }}</strong>
+                    </div>
+                    <div class="profile-item">
+                        <span>Ambulance</span>
+                        <strong>{{ driver_data.ambulance_type }}</strong>
+                    </div>
+                </div>
+
+                <div class="toggle-row">
+                    <div>
+                        <div class="toggle-label">Availability</div>
+                        <div class="status-pill {% if driver_data.state == 'On' %}online{% elif driver_data.state == 'Busy' %}busy{% else %}offline{% endif %}" id="driver-status-pill">
+                            {{ driver_data.state }}
+                        </div>
+                    </div>
+
+                    <label class="switch">
+                        <input type="checkbox" id="availability-toggle" {% if driver_data.state != 'Off' %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </section>
+
+            <section class="overlay-panel" id="booking-panel">
+                <div class="eyebrow">Active dispatch</div>
+                {% if booking %}
+                <h2>Pickup details</h2>
+                <p class="overlay-phone">Phone: {{ booking.phno }}</p>
+                <p class="overlay-hospital">Hospital: {{ booking.assigned_hosp.name|default:"Assigned hospital" }}</p>
+                <div class="overlay-actions">
+                    <button class="solid-button" data-driver-action="accept">Accept</button>
+                    <button class="outline-button" data-driver-action="reject">Reject</button>
+                    <button class="solid-button" data-driver-action="start">Start Trip</button>
+                    <button class="outline-button" data-driver-action="complete">Complete Trip</button>
+                </div>
+                {% else %}
+                <h2>Standing by</h2>
+                <p>No active booking is assigned right now.</p>
+                {% endif %}
+                <div class="form-message" id="driver-action-message"></div>
+            </section>
+        </aside>
+
+        <section class="map-stage">
+            <div class="offline-state" id="offline-state">
+                <h2>You are offline</h2>
+                <p>Go online to share GPS updates and receive dispatch routes.</p>
+            </div>
+            <div id="driver-map" class="map-canvas"></div>
+        </section>
+    </main>
+
+    {{ driver_data|json_script:"driver-data" }}
+    {{ booking_data|json_script:"driver-booking-data" }}
+
+    <script>
+        /* Frontend configuration injected from Django. */
+        window.driverDashboardConfig = {
+            csrfToken: "{{ csrf_token }}",
+            urls: {
+                toggle: "{% url 'toggle_driver_state' %}",
+                updateLocation: "{% url 'update_driver_location' %}",
+                accept: "{% url 'accept_booking' %}",
+                reject: "{% url 'reject_booking' %}",
+                start: "{% url 'start_trip' %}",
+                complete: "{% url 'complete_trip' %}"
+            }
+        };
+    </script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="{% static 'js/driver_map.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Ambulance</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+</head>
+<body class="tracking-shell">
+    <main class="tracking-layout">
+        <section class="tracking-card">
+            <div class="eyebrow">Live pickup tracking</div>
+            <h1>Ambulance is on the way</h1>
+            <p>Your live location will keep pinging while the driver is approaching.</p>
+
+            <div class="tracking-grid">
+                <div class="profile-item">
+                    <span>Booking</span>
+                    <strong>#{{ booking.id }}</strong>
+                </div>
+                <div class="profile-item">
+                    <span>Status</span>
+                    <strong id="tracking-status">{{ booking.status }}</strong>
+                </div>
+                <div class="profile-item">
+                    <span>Driver</span>
+                    <strong id="tracking-driver">{{ booking.assigned_driver.user.username|default:"Pending assignment" }}</strong>
+                </div>
+                <div class="profile-item">
+                    <span>Hospital</span>
+                    <strong id="tracking-hospital">{{ booking.assigned_hosp.name|default:"Pending hospital" }}</strong>
+                </div>
+            </div>
+
+            <div class="tracking-note" id="tracking-note">
+                Sharing your current location with dispatch.
+            </div>
+        </section>
+
+        <section class="tracking-map-panel">
+            <div id="user-tracking-map" class="map-canvas tracking-map"></div>
+        </section>
+    </main>
+
+    {{ booking.id|json_script:"tracking-booking-id" }}
+    {{ booking.pickup_lat|json_script:"tracking-pickup-lat" }}
+    {{ booking.pickup_long|json_script:"tracking-pickup-lng" }}
+    {{ booking.drop_lat|json_script:"tracking-hospital-lat" }}
+    {{ booking.drop_long|json_script:"tracking-hospital-lng" }}
+    {{ booking.assigned_driver.current_lat|default_if_none:"null"|json_script:"tracking-driver-lat" }}
+    {{ booking.assigned_driver.current_long|default_if_none:"null"|json_script:"tracking-driver-lng" }}
+
+    <script>
+        /* Rider tracking configuration injected from Django. */
+        window.userTrackingConfig = {
+            csrfToken: "{{ csrf_token }}",
+            statusUrl: "{% url 'booking_status' booking.id %}",
+            updateLocationUrl: "{% url 'update_booking_location' booking.id %}"
+        };
+    </script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="{% static 'js/user_tracking.js' %}"></script>
+</body>
+</html>

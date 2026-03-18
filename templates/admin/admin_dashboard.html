@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+</head>
+<body class="admin-shell">
+    <main class="admin-layout">
+        <section class="admin-header">
+            <div>
+                <div class="eyebrow">Control center</div>
+                <h1>Dispatch Operations Dashboard</h1>
+            </div>
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <span>Tracked drivers</span>
+                    <strong>{{ drivers_data|length }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Recent bookings</span>
+                    <strong>{{ bookings_data|length }}</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="admin-grid">
+            <article class="admin-panel">
+                <div class="panel-heading">
+                    <h2>Live Driver Fleet Tracking</h2>
+                    <p>All active and last-known driver locations.</p>
+                </div>
+                <div id="fleet-map" class="map-canvas admin-map"></div>
+            </article>
+
+            <article class="admin-panel">
+                <div class="panel-heading">
+                    <h2>Booking Hotspot Heatmap</h2>
+                    <p>Pickup demand concentration based on recent bookings.</p>
+                </div>
+                <div id="heatmap" class="map-canvas admin-map"></div>
+            </article>
+        </section>
+    </main>
+
+    {{ drivers_data|json_script:"admin-drivers-data" }}
+    {{ bookings_data|json_script:"admin-bookings-data" }}
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+    <script src="{% static 'js/admin_map.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RapidAid Dispatch</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="page-shell landing-shell">
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <main class="landing-hero">
+        <div class="eyebrow">Emergency ambulance dispatch</div>
+        <h1>Fast coordination when every minute matters.</h1>
+        <p>
+            Book an ambulance, verify the rider with OTP, and let your dispatch engine route the nearest driver.
+        </p>
+        <div class="landing-actions">
+            <a class="primary-cta" href="{% url 'phone_page' %}">Book Ambulance</a>
+            <a class="secondary-link" href="{% url 'driver_login' %}">Driver Login</a>
+        </div>
+    </main>
+</body>
+</html>

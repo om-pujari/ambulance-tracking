@@ -1,0 +1,49 @@
+<html>
+<body
+<h2>Enter Phone</h2>
+
+<form id="phoneForm">
+    {% csrf_token %}
+    <input type="text" id="phone" placeholder="Phone number">
+    <button type="submit">Send OTP</button>
+</form>
+
+<div id="otpBox" style="display:none;">
+    <h3>Enter OTP</h3>
+    <input type="text" id="otp">
+    <button onclick="verifyOTP()">Verify</button>
+</div>
+</body>
+<script>
+document.getElementById("phoneForm").onsubmit = function(e){
+    e.preventDefault();
+
+    let phone = document.getElementById("phone").value;
+
+    fetch("/send-otp/",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/x-www-form-urlencoded",
+            "X-CSRFToken":"{{ csrf_token }}"
+        },
+        body:`phone=${phone}`
+    });
+
+    document.getElementById("otpBox").style.display="block";
+}
+
+function verifyOTP(){
+    let phone = document.getElementById("phone").value;
+    let otp = document.getElementById("otp").value;
+
+    fetch("/verify-otp/",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/x-www-form-urlencoded",
+            "X-CSRFToken":"{{ csrf_token }}"
+        },
+        body:`phone=${phone}&code=${otp}`
+    }).then(r => window.location="/ambulance/");
+}
+</script>
+</html>

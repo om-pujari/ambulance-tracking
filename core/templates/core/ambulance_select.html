@@ -1,0 +1,21 @@
+<html>
+
+<body>
+<h2>Select Ambulance Type</h2>
+
+<form method="POST" action="/hospital-pref/">
+    {% csrf_token %}
+
+    <select name="ambulance_type">
+        <option value="ICU">ICU</option>
+        <option value="ALS">ALS</option>
+        <option value="BLS">BLS</option>
+    </select>
+
+    <button type="submit">Next</button>
+
+</form>
+</body>
+
+
+</html>
