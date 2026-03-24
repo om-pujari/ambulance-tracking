@@ -128,7 +128,14 @@
                     lat: driver.lat,
                     lon: driver.lng,
                 });
-
+                // ← ADD THIS:
+                if (window._driverWs && window._driverWs.readyState === WebSocket.OPEN) {
+                    window._driverWs.send(JSON.stringify({
+                        type: "location_update",
+                        lat: driver.lat,
+                        lng: driver.lng,
+                    }));
+                }
                 if (booking) {
                     drawRoute();
                 }
@@ -183,11 +190,35 @@
             }
         });
     });
+    function initDriverWebSocket(driverId) {
+        const driverWs = new WebSocket(`ws://${window.location.host}/ws/driver/${driverId}/`);
 
+        driverWs.onopen = () => console.log("Driver WS connected");
+
+        driverWs.onmessage = (e) => {
+            const data = JSON.parse(e.data);
+
+            if (data.type === "dispatch_request") {
+                // New booking incoming — refresh page to show booking panel
+                setMessage(`New dispatch request! Booking #${data.booking_id}`, "success");
+                window.setTimeout(() => window.location.reload(), 1500);
+            }
+
+            if (data.type === "accept_confirmed") {
+                setMessage("Booking accepted!", "success");
+            }
+        };
+
+        driverWs.onclose = () => console.log("Driver WS disconnected");
+
+        window._driverWs = driverWs;
+    }                                  // ← closes initDriverWebSocket correctly
+  
     initMap();
     showOfflineState(driver.state === "Off");
     updateStatusPill(driver.state);
     if (driver.state !== "Off") {
         startLocationWatch();
+        initDriverWebSocket(driver.id);
     }
 })();

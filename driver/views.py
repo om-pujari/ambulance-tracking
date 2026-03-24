@@ -37,6 +37,7 @@ def driver_dashboard(request):
     ).first()
 
     driver_data = {
+        "id": driver.pk, 
         "name": request.user.get_full_name() or request.user.username,
         "age": getattr(request.user, "age", None),
         "license": driver.licens,
@@ -80,7 +81,7 @@ def update_driver_location(request):
     driver.current_lat = lat
     driver.current_long = lon
     driver.save()
-    print(driver.current_lat)
+
 
     return JsonResponse({"status": "ok"})
 

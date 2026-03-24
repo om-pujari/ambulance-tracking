@@ -43,24 +43,68 @@
             <div id="user-tracking-map" class="map-canvas tracking-map"></div>
         </section>
     </main>
+    
+{{ booking.id|json_script:"tracking-booking-id" }}
+{{ booking.pickup_lat|json_script:"tracking-pickup-lat" }}
+{{ booking.pickup_long|json_script:"tracking-pickup-lng" }}
+{{ booking.drop_lat|json_script:"tracking-hospital-lat" }}
+{{ booking.drop_long|json_script:"tracking-hospital-lng" }}
+{{ booking.assigned_driver.current_lat|default_if_none:"null"|json_script:"tracking-driver-lat" }}
+{{ booking.assigned_driver.current_long|default_if_none:"null"|json_script:"tracking-driver-lng" }}
 
-    {{ booking.id|json_script:"tracking-booking-id" }}
-    {{ booking.pickup_lat|json_script:"tracking-pickup-lat" }}
-    {{ booking.pickup_long|json_script:"tracking-pickup-lng" }}
-    {{ booking.drop_lat|json_script:"tracking-hospital-lat" }}
-    {{ booking.drop_long|json_script:"tracking-hospital-lng" }}
-    {{ booking.assigned_driver.current_lat|default_if_none:"null"|json_script:"tracking-driver-lat" }}
-    {{ booking.assigned_driver.current_long|default_if_none:"null"|json_script:"tracking-driver-lng" }}
 
-    <script>
-        /* Rider tracking configuration injected from Django. */
-        window.userTrackingConfig = {
-            csrfToken: "{{ csrf_token }}",
-            statusUrl: "{% url 'booking_status' booking.id %}",
-            updateLocationUrl: "{% url 'update_booking_location' booking.id %}"
-        };
-    </script>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="{% static 'js/user_tracking.js' %}"></script>
+<!-- 1. config FIRST so user_tracking.js finds it -->
+<script>
+    window.userTrackingConfig = {
+        csrfToken: "{{ csrf_token }}",
+        statusUrl: "{% url 'booking_status' booking.id %}",
+        updateLocationUrl: "{% url 'update_booking_location' booking.id %}"
+    };
+</script>
+
+<!-- 2. Leaflet -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- 3. user_tracking.js — needs L and userTrackingConfig, sets window.trackingMap and window.driverMarker -->
+<script src="{% static 'js/user_tracking.js' %}"></script>
+
+<!-- 4. WebSocket LAST — needs window.driverMarker set by user_tracking.js -->
+<script>
+    const bookingId = JSON.parse(document.getElementById("tracking-booking-id").textContent);
+
+    const ws = new WebSocket(`ws://${window.location.host}/ws/track/${bookingId}/`);
+
+    ws.onopen = () => console.log("Tracking connected");
+
+    ws.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+
+        if (data.type === "driver_location") {
+            if (window.driverMarker) {
+                window.driverMarker.setLatLng([data.lat, data.lng]);
+                window.trackingMap.panTo([data.lat, data.lng]);
+            }
+        }
+
+        if (data.type === "booking_update") {
+            document.getElementById("tracking-status").innerText = data.status;
+            document.getElementById("tracking-note").innerText = data.message;
+            if (data.driver_name) document.getElementById("tracking-driver").innerText = data.driver_name;
+            if (data.hospital_name) document.getElementById("tracking-hospital").innerText = data.hospital_name;
+            if (data.status === "terminated") {
+                ws.close();
+                document.getElementById("tracking-note").innerText = "No drivers available. Please try again.";
+            }
+            if (data.status === "completed") {
+                ws.close();
+                document.getElementById("tracking-note").innerText = "Booking completed. Stay safe!";
+            }
+        }
+    };
+
+    ws.onclose = () => console.log("Tracking disconnected");
+    ws.onerror = (e) => console.error("WebSocket error", e);
+</script>
+</body>
 </body>
 </html>

@@ -5,6 +5,10 @@ from django.http import JsonResponse
 from .models import OTP, Booking
 from core.services import dispatch_booking
 from driver.models import Driver
+from asgiref.sync import async_to_sync
+from .services import dispatch_booking_async, notify_user
+
+# Inside your booking creation view, after calling dispatch_booking():
 
 
 def is_ajax(request):
@@ -90,9 +94,14 @@ def create_booking(request):                #fine tune later to avoid redundant 
             status="pending"
         )
 
-        dispatch_booking(booking)
-        request.session["booking_id"] = booking.id
+        dispatched = dispatch_booking(booking)
+        print("After sync dispatch — status:", booking.status, "driver:", booking.assigned_driver_id)
 
+        async_to_sync(notify_user)(
+            booking.id,
+            "assigned" if dispatched else "terminated",
+            "Driver assigned!" if dispatched else "No drivers available right now."
+        )
         if is_ajax(request):
             return JsonResponse({
                 "status": "created",
