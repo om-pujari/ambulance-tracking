@@ -11,4 +11,5 @@ urlpatterns = [
     path("start-trip/", views.start_trip, name="start_trip"),
     path("complete-trip/", views.complete_trip, name="complete_trip"),
     path("toggle/", views.toggle_driver_state, name="toggle_driver_state"),
+    path("admin-dashboard/", views.admin_dashboard, name="admin_dashboard"),
 ]

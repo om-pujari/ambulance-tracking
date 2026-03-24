@@ -178,3 +178,35 @@ def toggle_driver_state(request):
         return JsonResponse({"status": "ok", "state": driver.state})
 
     return redirect("driver_dashboard")
+
+
+@login_required
+def admin_dashboard(request):
+    drivers = [
+        {
+            "name": driver.user.get_full_name() or driver.user.username,
+            "state": driver.state,
+            "ambulance_type": driver.ambulance_type,
+            "lat": driver.current_lat,
+            "lng": driver.current_long,
+        }
+        for driver in Driver.objects.select_related("user")
+        if driver.current_lat is not None and driver.current_long is not None
+    ]
+
+    bookings = [
+        {
+            "phone": booking.phno,
+            "status": booking.status,
+            "ambulance_type": booking.ambulance_type,
+            "hospital_preference": booking.hospital_prefrences,
+            "lat": booking.pickup_lat,
+            "lng": booking.pickup_long,
+        }
+        for booking in Booking.objects.all().order_by("-created_at")[:100]
+    ]
+
+    return render(request, "admin/admin_dashboard.html", {
+        "drivers_data": drivers,
+        "bookings_data": bookings,
+    })
