@@ -60,6 +60,8 @@ class TrackingConsumer(AsyncWebsocketConsumer):
             "type": "booking_update",
             "status": event["status"],
             "message": event.get("message", ""),
+            "driver_name": event.get("driver_name", ""),
+            "hospital_name": event.get("hospital_name", ""),
         }))
 
     @database_sync_to_async
@@ -157,7 +159,7 @@ class DriverConsumer(AsyncWebsocketConsumer):
         # Mark driver as excluded and re-trigger dispatch
         await self.free_driver()
         # Import here to avoid circular imports
-        from .dispatch import dispatch_booking_async
+        from .services import dispatch_booking_async
         await dispatch_booking_async(booking_id, excluded_driver_ids=[int(self.driver_id)])
 
     async def handle_status_update(self, data):
