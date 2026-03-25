@@ -78,11 +78,17 @@ WSGI_APPLICATION = "ambulance.wsgi.application"
 ASGI_APPLICATION = "ambulance.asgi.application"  #
 
 
+
+REDIS_URL = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379")
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.environ.get("REDIS_URL", "redis://127.0.0.1:6379")],
+            "hosts": [{
+                "address": REDIS_URL,
+                "ssl": REDIS_URL.startswith("rediss://"),
+            }],
         },
     }
 }
