@@ -43,6 +43,11 @@ INSTALLED_APPS = [
     "driver",
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{host}" 
+    for host in os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
+]
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",  
