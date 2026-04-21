@@ -5,4 +5,4 @@ daphne
 asgiref
 whitenoise
 requests
-redis==4.6.0
+redis==4.5.5
