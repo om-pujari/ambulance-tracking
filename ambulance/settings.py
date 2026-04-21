@@ -21,10 +21,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 import os
 
+# Sessions
 SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_AGE = 3600
+
+# CSRF
 CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SAMESITE = "Lax"
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "jango-insecure-$bafc20afaao9$bo6i%9vq)nrt1-)%8du*9wqa5v#9is5+f5$g")
 DEBUG = os.environ.get("DEBUG", "False") == "True"
