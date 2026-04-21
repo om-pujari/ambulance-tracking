@@ -31,7 +31,7 @@ def send_otp(request):
         code=code
     )
 
-    print("OTP:", code)   # for testing
+    print("OTP:", code,flush=True)   # for testing
 
     return JsonResponse({"status": "sent"})
 
