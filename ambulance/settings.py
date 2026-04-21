@@ -44,8 +44,7 @@ INSTALLED_APPS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    f"https://{host}" 
-    for host in os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
+    "https://ambulance-tracking.onrender.com",
 ]
 
 MIDDLEWARE = [
