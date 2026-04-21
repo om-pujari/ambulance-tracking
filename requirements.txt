@@ -1,8 +1,8 @@
 django
-channels
-channels-redis
+channels==4.0.0
+channels-redis==4.1.0
 daphne
 asgiref
 whitenoise
-cryptography
-cffi
+requests
+redis==4.6.0
