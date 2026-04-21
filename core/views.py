@@ -70,7 +70,8 @@ def hospital_pref(request):
 
 def create_booking(request):                #fine tune later to avoid redundant booking from user pages 
     if request.method == "POST":
-
+        print("SESSION DATA:", dict(request.session), flush=True)
+        print("POST DATA:", dict(request.POST), flush=True)
         phone = request.session.get("phone")
         ambulance_type = request.session.get("ambulance_type") or request.POST.get("ambulance_type")
         hospital_pref = request.POST.get("hospital_pref")
