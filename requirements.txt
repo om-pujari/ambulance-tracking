@@ -1,8 +1,8 @@
 django
-channels==3.0.5
-channels-redis==3.4.1
+channels==4.0.0
+channels-redis==4.1.0
 daphne
 asgiref
 whitenoise
 requests
-redis==4.5.5
+redis==4.6.0
